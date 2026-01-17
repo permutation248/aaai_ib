@@ -1,7 +1,7 @@
 import torch.utils.data
 import wandb
 import torch as th
-
+import os  # <--- 新增这一行
 import numpy as np
 import random
 import config
@@ -115,17 +115,36 @@ def train(cfg, net, loader, run, eval_data, callbacks=tuple()):
         time_list.append(end - begin)
 
 
-    list_txt(path='../../acc_nmi_loss/iapr_loss.txt', list=Loss_list)
-    list_txt(path='../../time_epoch/iapr_time.txt', list=time_list)
-    list_txt(path='../../acc_nmi_loss/iapr_acc.txt', list=Accuracy_list)
-    list_txt(path='../../acc_nmi_loss/iapr_nmi.txt', list=NMI_list)
+    # 获取数据集名称 (例如 'scene15')
+    ds_name = cfg.dataset_config.name
+    
+    # 定义输出目录 (相对于 src 目录的一级上层)
+    output_dir_metrics = '../acc_nmi_loss'
+    output_dir_time = '../time_epoch'
+    
+    # 确保目录存在，不存在则创建
+    os.makedirs(output_dir_metrics, exist_ok=True)
+    os.makedirs(output_dir_time, exist_ok=True)
+
+    # 动态构建路径并保存
+    list_txt(path=os.path.join(output_dir_metrics, f'{ds_name}_loss.txt'), list=Loss_list)
+    list_txt(path=os.path.join(output_dir_time, f'{ds_name}_time.txt'), list=time_list)
+    list_txt(path=os.path.join(output_dir_metrics, f'{ds_name}_acc.txt'), list=Accuracy_list)
+    list_txt(path=os.path.join(output_dir_metrics, f'{ds_name}_nmi.txt'), list=NMI_list)
 
 
 def main():
     """
     Run an experiment.
     """
-    experiment_name, cfg = config.get_experiment_config()
+    import config.experiments.scene15 as scene15_config
+    experiment_name = 'scene15'
+    
+    # 判断一下 scene15_config 是模块还是对象
+    if hasattr(scene15_config, 'scene15'):
+        cfg = scene15_config.scene15
+    else:
+        cfg = scene15_config 
     """     # 实验名称
     experiment_name='iapr'
 

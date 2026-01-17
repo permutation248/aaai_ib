@@ -57,7 +57,8 @@ def load_dataset(name, n_samples=None, select_views=None, select_labels=None, la
 
     views = [v.astype(np.float32) for v in views]
     if to_dataset:
-        index = np.arange(0, 7855)
+        # 修改为根据 labels 的实际长度生成索引
+        index = np.arange(0, labels.shape[0]) 
         dataset = th.utils.data.TensorDataset(*[th.Tensor(v).to(config.DEVICE, non_blocking=True) for v in views],
                                               th.Tensor(labels).to(config.DEVICE, non_blocking=True),
                                               th.Tensor(index).to(config.DEVICE, non_blocking=True).type(th.int64))
